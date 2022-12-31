@@ -23,8 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GreetServiceClient interface {
 	SayHello(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (*HelloResponse, error)
-	SayHelloClientStreaning(ctx context.Context, in *NameList, opts ...grpc.CallOption) (GreetService_SayHelloClientStreaningClient, error)
-	SayHelloServerStreaning(ctx context.Context, opts ...grpc.CallOption) (GreetService_SayHelloServerStreaningClient, error)
+	SayHelloClientStreaming(ctx context.Context, in *NameList, opts ...grpc.CallOption) (GreetService_SayHelloClientStreamingClient, error)
+	SayHelloServerStreaming(ctx context.Context, opts ...grpc.CallOption) (GreetService_SayHelloServerStreamingClient, error)
 	SayHelloBidirectionalStreaming(ctx context.Context, opts ...grpc.CallOption) (GreetService_SayHelloBidirectionalStreamingClient, error)
 }
 
@@ -45,12 +45,12 @@ func (c *greetServiceClient) SayHello(ctx context.Context, in *NoParam, opts ...
 	return out, nil
 }
 
-func (c *greetServiceClient) SayHelloClientStreaning(ctx context.Context, in *NameList, opts ...grpc.CallOption) (GreetService_SayHelloClientStreaningClient, error) {
-	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[0], "/greet_service.GreetService/SayHelloClientStreaning", opts...)
+func (c *greetServiceClient) SayHelloClientStreaming(ctx context.Context, in *NameList, opts ...grpc.CallOption) (GreetService_SayHelloClientStreamingClient, error) {
+	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[0], "/greet_service.GreetService/SayHelloClientStreaming", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &greetServiceSayHelloClientStreaningClient{stream}
+	x := &greetServiceSayHelloClientStreamingClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -60,16 +60,16 @@ func (c *greetServiceClient) SayHelloClientStreaning(ctx context.Context, in *Na
 	return x, nil
 }
 
-type GreetService_SayHelloClientStreaningClient interface {
+type GreetService_SayHelloClientStreamingClient interface {
 	Recv() (*HelloResponse, error)
 	grpc.ClientStream
 }
 
-type greetServiceSayHelloClientStreaningClient struct {
+type greetServiceSayHelloClientStreamingClient struct {
 	grpc.ClientStream
 }
 
-func (x *greetServiceSayHelloClientStreaningClient) Recv() (*HelloResponse, error) {
+func (x *greetServiceSayHelloClientStreamingClient) Recv() (*HelloResponse, error) {
 	m := new(HelloResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -77,30 +77,30 @@ func (x *greetServiceSayHelloClientStreaningClient) Recv() (*HelloResponse, erro
 	return m, nil
 }
 
-func (c *greetServiceClient) SayHelloServerStreaning(ctx context.Context, opts ...grpc.CallOption) (GreetService_SayHelloServerStreaningClient, error) {
-	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[1], "/greet_service.GreetService/SayHelloServerStreaning", opts...)
+func (c *greetServiceClient) SayHelloServerStreaming(ctx context.Context, opts ...grpc.CallOption) (GreetService_SayHelloServerStreamingClient, error) {
+	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[1], "/greet_service.GreetService/SayHelloServerStreaming", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &greetServiceSayHelloServerStreaningClient{stream}
+	x := &greetServiceSayHelloServerStreamingClient{stream}
 	return x, nil
 }
 
-type GreetService_SayHelloServerStreaningClient interface {
+type GreetService_SayHelloServerStreamingClient interface {
 	Send(*HelloRequest) error
 	CloseAndRecv() (*MessageList, error)
 	grpc.ClientStream
 }
 
-type greetServiceSayHelloServerStreaningClient struct {
+type greetServiceSayHelloServerStreamingClient struct {
 	grpc.ClientStream
 }
 
-func (x *greetServiceSayHelloServerStreaningClient) Send(m *HelloRequest) error {
+func (x *greetServiceSayHelloServerStreamingClient) Send(m *HelloRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *greetServiceSayHelloServerStreaningClient) CloseAndRecv() (*MessageList, error) {
+func (x *greetServiceSayHelloServerStreamingClient) CloseAndRecv() (*MessageList, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func (x *greetServiceSayHelloBidirectionalStreamingClient) Recv() (*HelloRespons
 // for forward compatibility
 type GreetServiceServer interface {
 	SayHello(context.Context, *NoParam) (*HelloResponse, error)
-	SayHelloClientStreaning(*NameList, GreetService_SayHelloClientStreaningServer) error
-	SayHelloServerStreaning(GreetService_SayHelloServerStreaningServer) error
+	SayHelloClientStreaming(*NameList, GreetService_SayHelloClientStreamingServer) error
+	SayHelloServerStreaming(GreetService_SayHelloServerStreamingServer) error
 	SayHelloBidirectionalStreaming(GreetService_SayHelloBidirectionalStreamingServer) error
 	mustEmbedUnimplementedGreetServiceServer()
 }
@@ -160,11 +160,11 @@ type UnimplementedGreetServiceServer struct {
 func (UnimplementedGreetServiceServer) SayHello(context.Context, *NoParam) (*HelloResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
-func (UnimplementedGreetServiceServer) SayHelloClientStreaning(*NameList, GreetService_SayHelloClientStreaningServer) error {
-	return status.Errorf(codes.Unimplemented, "method SayHelloClientStreaning not implemented")
+func (UnimplementedGreetServiceServer) SayHelloClientStreaming(*NameList, GreetService_SayHelloClientStreamingServer) error {
+	return status.Errorf(codes.Unimplemented, "method SayHelloClientStreaming not implemented")
 }
-func (UnimplementedGreetServiceServer) SayHelloServerStreaning(GreetService_SayHelloServerStreaningServer) error {
-	return status.Errorf(codes.Unimplemented, "method SayHelloServerStreaning not implemented")
+func (UnimplementedGreetServiceServer) SayHelloServerStreaming(GreetService_SayHelloServerStreamingServer) error {
+	return status.Errorf(codes.Unimplemented, "method SayHelloServerStreaming not implemented")
 }
 func (UnimplementedGreetServiceServer) SayHelloBidirectionalStreaming(GreetService_SayHelloBidirectionalStreamingServer) error {
 	return status.Errorf(codes.Unimplemented, "method SayHelloBidirectionalStreaming not implemented")
@@ -200,46 +200,46 @@ func _GreetService_SayHello_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GreetService_SayHelloClientStreaning_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _GreetService_SayHelloClientStreaming_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(NameList)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(GreetServiceServer).SayHelloClientStreaning(m, &greetServiceSayHelloClientStreaningServer{stream})
+	return srv.(GreetServiceServer).SayHelloClientStreaming(m, &greetServiceSayHelloClientStreamingServer{stream})
 }
 
-type GreetService_SayHelloClientStreaningServer interface {
+type GreetService_SayHelloClientStreamingServer interface {
 	Send(*HelloResponse) error
 	grpc.ServerStream
 }
 
-type greetServiceSayHelloClientStreaningServer struct {
+type greetServiceSayHelloClientStreamingServer struct {
 	grpc.ServerStream
 }
 
-func (x *greetServiceSayHelloClientStreaningServer) Send(m *HelloResponse) error {
+func (x *greetServiceSayHelloClientStreamingServer) Send(m *HelloResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _GreetService_SayHelloServerStreaning_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(GreetServiceServer).SayHelloServerStreaning(&greetServiceSayHelloServerStreaningServer{stream})
+func _GreetService_SayHelloServerStreaming_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GreetServiceServer).SayHelloServerStreaming(&greetServiceSayHelloServerStreamingServer{stream})
 }
 
-type GreetService_SayHelloServerStreaningServer interface {
+type GreetService_SayHelloServerStreamingServer interface {
 	SendAndClose(*MessageList) error
 	Recv() (*HelloRequest, error)
 	grpc.ServerStream
 }
 
-type greetServiceSayHelloServerStreaningServer struct {
+type greetServiceSayHelloServerStreamingServer struct {
 	grpc.ServerStream
 }
 
-func (x *greetServiceSayHelloServerStreaningServer) SendAndClose(m *MessageList) error {
+func (x *greetServiceSayHelloServerStreamingServer) SendAndClose(m *MessageList) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *greetServiceSayHelloServerStreaningServer) Recv() (*HelloRequest, error) {
+func (x *greetServiceSayHelloServerStreamingServer) Recv() (*HelloRequest, error) {
 	m := new(HelloRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -287,13 +287,13 @@ var GreetService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "SayHelloClientStreaning",
-			Handler:       _GreetService_SayHelloClientStreaning_Handler,
+			StreamName:    "SayHelloClientStreaming",
+			Handler:       _GreetService_SayHelloClientStreaming_Handler,
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "SayHelloServerStreaning",
-			Handler:       _GreetService_SayHelloServerStreaning_Handler,
+			StreamName:    "SayHelloServerStreaming",
+			Handler:       _GreetService_SayHelloServerStreaming_Handler,
 			ClientStreams: true,
 		},
 		{
