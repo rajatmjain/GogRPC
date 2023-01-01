@@ -5,26 +5,26 @@ package greet_service;
 
 service GreetService{
     rpc SayHello(NoParam) returns (HelloResponse);
-    rpc SayHelloClientStreaming(NameList) returns (stream HelloResponse);
-    rpc SayHelloServerStreaming(stream HelloRequest) returns (MessageList);
+    rpc SayHelloClientStreaming(stream HelloRequest) returns (MessagesList);
+    rpc SayHelloServerStreaming(NamesList) returns (stream HelloResponse);
     rpc SayHelloBidirectionalStreaming(stream HelloRequest) returns (stream HelloResponse);
 
 }
 
 message NoParam{};
 
+message HelloRequest{
+    string name = 1;
+}
+
 message HelloResponse{
     string message = 1;
 }
 
-message NameList{
+message NamesList{
     repeated string names = 1;
 }
 
-message HelloRequest{
-    string message = 1;
-}
-
-message MessageList{
+message MessagesList{
     repeated string messages = 1;
 }
